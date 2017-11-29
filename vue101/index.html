@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue-101</title>
+    <script src="https://unpkg.com/vue"></script>
+</head>
+<body>
+    <div id = "app">
+        <p> {{rawHtml}} </p>
+        <p v-if="seen" >Using v-html directive: <span v-html="rawHtml"></span></p>
+        <button @click="toggleShow" :disabled="isButtonDisabled">{{ seen ? 'hidden' : 'show'}}</button>
+        <button @click="toggleBtn">{{ isButtonDisabled ? "解除锁定":"锁定显示按钮" }}</button>
+        <p> {{ message }} </p>
+        <p> reverse by words is {{reverseWord}}</p>
+        <p v-once>{{ "The message using v-once "+message }}</p>
+        <input type="text" v-model="message">
+        <button @click="reverseMessage" :title="message">逆转消息</button>
+        <ol>
+            <li v-for="todo in todos"> <span :id="'list'+todo.id">{{ todo.text }}</span> </li>
+        </ol>
+        <p></p>
+    </div>
+
+    <!-- script below -->
+    <script>
+        var data = {
+            seen: true,
+            isButtonDisabled: false,
+            message: 'Hello Vue!',
+            todos: [
+                { id : 1 , text : '学习JavaScript' },
+                { id : 2 , text : '学习Vue' },
+                { id : 3 , text : '整个牛项目' }
+            ],
+            rawHtml: '<span style="color:red">This text should be red!</span>'
+        };
+        
+        console.log("data before new a Vue is : ");
+        console.log(data);
+
+        var app = new Vue({
+            el: '#app',
+            data: data,
+            computed: {
+                reverseWord : function(){
+                    return this.message.split(" ").reverse().join(" ");
+                }
+            },
+            methods: {
+                reverseMessage : function(){
+                    this.message = this.message.split("").reverse().join("");
+                },
+                toggleShow : function(){
+                    this.seen = !this.seen;
+                },
+                toggleBtn : function(){
+                    this.isButtonDisabled = !this.isButtonDisabled;
+                }
+            }
+        });
+        app.$watch('message', function (newValue, oldValue) {
+            console.log(oldValue+" ==> "+newValue);
+        })
+        console.log("app.$el is :");
+        console.log(app.$el);
+        console.log("app.$data is :")
+        console.log(app.$data);
+        console.log("data after new a Vue is : ");
+        console.log(data);
+        console.log("app.$data === data ? ", app.$data === data ? true : false);
+
+    </script>
+</body>
+</html>
