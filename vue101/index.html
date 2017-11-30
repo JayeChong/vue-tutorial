@@ -6,6 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Vue-101</title>
     <script src="https://unpkg.com/vue"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
 </head>
 <body>
     <div id = "app">
@@ -21,15 +23,35 @@
         <ol>
             <li v-for="todo in todos"> <span :id="'list'+todo.id">{{ todo.text }}</span> </li>
         </ol>
-        <p></p>
+        <p>
+            <label for="fullname">FullName</label>
+            <input type="text" id="fullname" v-model="fullName">
+        </p>
+        <p>
+            <label for="firstname">FirstName</label>
+            <input type="text" id="firstname" v-model="firstName">
+            <label for="lastname">LastName</label>
+            <input type="text" id="lastname" v-model="lastName">
+        </p>
+        <hr>
+        <p>
+            <label for="question">Ask a yes/no question</label>
+            <input type="text" id="question" v-model="question">
+        </p>
+        <p> {{ answer }} </p>
     </div>
 
     <!-- script below -->
     <script>
+
         var data = {
             seen: true,
             isButtonDisabled: false,
             message: 'Hello Vue!',
+            firstName: '',
+            lastName: '',
+            question: '',
+            answer: 'I cannot give you an answer until you ask a question!',
             todos: [
                 { id : 1 , text : '学习JavaScript' },
                 { id : 2 , text : '学习Vue' },
@@ -37,7 +59,7 @@
             ],
             rawHtml: '<span style="color:red">This text should be red!</span>'
         };
-        
+
         console.log("data before new a Vue is : ");
         console.log(data);
 
@@ -47,6 +69,24 @@
             computed: {
                 reverseWord : function(){
                     return this.message.split(" ").reverse().join(" ");
+                },
+                fullName : {
+                    get : function(){
+                        if(!this.firstName && !this.lastName)
+                            return '';
+                        if(this.firstName && !this.lastName)
+                            return this.firstName;
+                        if(!this.firstName && this.lastName)
+                            return this.lastName;
+                        return this.firstName+' '+this.lastName;
+                    },
+                    set : function(newValue){
+                        console.log('fullName setter called! , new fullName is : ',newValue);
+                        var names = newValue.split(' ');
+                        console.log(names);
+                        this.firstName = names[0] ? names[0] : '';
+                        this.lastName = names[1] ? names[1] : '';
+                    }
                 }
             },
             methods: {
@@ -58,9 +98,35 @@
                 },
                 toggleBtn : function(){
                     this.isButtonDisabled = !this.isButtonDisabled;
+                },
+                getAnswer : _.debounce(
+                    function () {
+                        if (this.question.indexOf('?') === -1) {
+                            this.answer = 'Questions usually contain a question mark. ;-)'
+                            return
+                        }
+                        this.answer = 'Thinking...'
+                        var vm = this
+                        axios.get('https://yesno.wtf/api')
+                            .then(function (response) {
+                                vm.answer = _.capitalize(response.data.answer)
+                            })
+                            .catch(function (error) {
+                                vm.answer = 'Error! Could not reach the API. ' + error
+                            })
+                    },
+                    // 这是我们为判定用户停止输入等待的毫秒数
+                    500
+                  )
+            },
+            watch: {
+                question: function(newQuestion){
+                    this.answer = "waitting for you stop typing !";
+                    this.getAnswer();
                 }
             }
         });
+
         app.$watch('message', function (newValue, oldValue) {
             console.log(oldValue+" ==> "+newValue);
         })
