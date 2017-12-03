@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://unpkg.com/vue"></script>
+    <title>vue103</title>
+</head>
+<body>
+
+    <div id="app">
+        <p>
+            <input type="text" v-model="message.message1">
+            <input type="text" v-model="message.message2">
+        </p>
+        <!-- <child-component :message1="message.message1" :message2="message.message2"></child-component> -->
+        <child-component v-bind="message"></child-component>
+    </div>
+
+    <!-- JS blow -->
+    <script>
+        Vue.component("child-component" , {
+            template: `<span> {{ message1 }} - {{ message2 }} </span>`,
+            props: ['message1','message2'],
+        });
+
+        new Vue({
+            el: "#app",
+            data: {
+                message : {
+                    message1 : 'Hello!',
+                    message2 : 'Jaye Chong.'
+                }
+            },
+        });
+    </script>
+</body>
+</html>

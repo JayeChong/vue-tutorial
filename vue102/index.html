@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://unpkg.com/vue"></script>
+    <title>vue-102</title>
+</head>
+<body>
+    <p>如何组件化以及需要注意的点</p>
+    <div id="example">
+        <my-component></my-component>
+        <second-component></second-component>
+        <counter></counter>
+        <counter></counter>
+        <counter></counter>
+    </div>
+    <hr>
+    <div>
+        <my-component></my-component>
+        <second-component></second-component>
+    </div>
+    <script>
+        // 注意确保在初始化根实例之前注册组件
+        Vue.component('my-component', {
+            // 选项
+            template: '<div>A custom component!</div>',
+        });
+
+        var comp2 = {
+            template: `<p>Second custom component!</p>`,
+        }
+
+        var shareCounter = { counter : 0 };
+        var counter = {
+            template: `<button v-on:click="counter += 1">{{ counter }}</button>`,
+            data: function(){
+                return {
+                    counter: 0,
+                };
+            },
+        }
+
+        // 根(root)实例
+        new Vue({
+            el: '#example',
+            components: {
+                'second-component': comp2,
+                'counter': counter,
+            }
+        })
+    </script>
+</body>
+</html>

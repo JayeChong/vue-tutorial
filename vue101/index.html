@@ -8,6 +8,7 @@
     <script src="https://unpkg.com/vue"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
     <div id = "app">
@@ -21,7 +22,7 @@
         <input type="text" v-model="message">
         <button @click="reverseMessage" :title="message">逆转消息</button>
         <ol>
-            <li v-for="todo in todos"> <span :id="'list'+todo.id">{{ todo.text }}</span> </li>
+            <li v-for="(todo , index) in todos" :key="'list'+todo.id" v-if="todo.show"> <span :id="'list'+index">{{ todo.text }}</span> </li>
         </ol>
         <p>
             <label for="fullname">FullName</label>
@@ -34,29 +35,73 @@
             <input type="text" id="lastname" v-model="lastName">
         </p>
         <hr>
-        <p>
+        <p class="box-padding" :class="{active: isActive , 'textWhite': textColor}">
             <label for="question">Ask a yes/no question</label>
             <input type="text" id="question" v-model="question">
         </p>
-        <p> {{ answer }} </p>
+        <p :class="classObject"> {{ answer }} </p>
+        <hr>
+        <template v-if="ok">
+            <h1>Title</h1>
+            <p>Paragraph 1</p>
+            <p>Paragraph 2</p>
+        </template>
+        <hr>
+        <p>
+            <template v-if="loginType === 'username'">
+                <label>Username</label>
+                <input placeholder="Enter your username" key="username-input">
+            </template>
+            <template v-else>
+                <label>Email</label>
+                <input placeholder="Enter your email address" key="email-input">
+            </template>
+        </p>
+        <p>
+            <button :id="testBindID" @click="toggleLoginType">Toggle loginType</button>
+        </p>
+        <hr>
+        <span v-for="n in evenNumber">{{n}}</span>
+        <br>
+        <span v-for="n in getEvenNumber(numbers)">{{n}}</span>
+        <p>
+            <button @click.stop="say('hi')">sayHi</button>
+        </p>
+        <div id="example-5">
+            <select v-model="selected">
+                <option disabled value="">请选择</option>
+                <option>A</option>
+                <option>B</option>
+                <option>C</option>
+            </select>
+            <span>Selected: {{ selected }}</span>
+        </div>
     </div>
 
     <!-- script below -->
     <script>
 
         var data = {
+            selected: '',
+            testBindID: 'testID',
+            loginType: 'username',
+            ok: 1,
             seen: true,
             isButtonDisabled: false,
+            isActive: true,
+            textColor: true,
+            boxPadding: true,
             message: 'Hello Vue!',
             firstName: '',
             lastName: '',
             question: '',
             answer: 'I cannot give you an answer until you ask a question!',
             todos: [
-                { id : 1 , text : '学习JavaScript' },
-                { id : 2 , text : '学习Vue' },
-                { id : 3 , text : '整个牛项目' }
+                { id : 1 , text : '学习JavaScript' , show : true},
+                { id : 2 , text : '学习Vue' , show : false},
+                { id : 3 , text : '整个牛项目' , show : true}
             ],
+            numbers: [1,2,3,4,5,6,7,8,9,10],
             rawHtml: '<span style="color:red">This text should be red!</span>'
         };
 
@@ -87,9 +132,24 @@
                         this.firstName = names[0] ? names[0] : '';
                         this.lastName = names[1] ? names[1] : '';
                     }
+                },
+                classObject: function(){
+                    return {
+                        active: this.isActive,
+                        'textWhite': this.textColor,
+                        'box-padding': this.boxPadding,
+                    };
+                },
+                evenNumber: function(){
+                    return this.numbers.filter(function(n){
+                        return n%2 === 0;
+                    });
                 }
             },
             methods: {
+                say : function(message){
+                    alert(message);
+                },
                 reverseMessage : function(){
                     this.message = this.message.split("").reverse().join("");
                 },
@@ -117,7 +177,15 @@
                     },
                     // 这是我们为判定用户停止输入等待的毫秒数
                     500
-                  )
+                ),
+                toggleLoginType : function(){
+                    this.loginType = this.loginType === "username" ? "email" : "username";
+                },
+                getEvenNumber : function(){
+                    return this.numbers.filter(function(n){
+                        return n%2 === 0;
+                    });
+                }
             },
             watch: {
                 question: function(newQuestion){
