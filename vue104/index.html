@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://unpkg.com/vue"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <p>这是关于slot的用法</p>
+    <div id="app">
+        <comp1 ref="comp1">
+            <p>这是一些初始内容</p>
+            <p>这是更多的初始内容</p>
+        </comp1>
+        <hr>
+        <app-layout>
+            <h1 slot="header">这里可能是一个页面标题</h1>
+
+            <p>主要内容的一个段落。</p>
+            <p>另一个主要段落。</p>
+
+            <p slot="footer">这里有一些联系信息</p>
+        </app-layout>
+        <hr>
+        <div class="parent">
+            <child>
+                <!-- 在 2.5.0+，slot-scope 能被用在任意元素或组件中而不再局限于 <template>。 -->
+                <template slot-scope="props">
+                    <!-- <span>hello from parent</span> -->
+                    <span>{{ props.text }}</span>
+                </template>
+            </child>
+        </div>
+        <hr>
+        <custom-list :items="items">
+            <!-- 作用域插槽也可以是具名的 -->
+            <li slot="item" slot-scope="props" class="my-fancy-item">
+                {{ props.text }}
+            </li>
+        </custom-list>
+        <hr>
+        <async-example></async-example>
+
+    </div>
+
+    <!-- JS blow -->
+    <script>
+        Vue.component("comp1", {
+            template: `
+            <div>
+                <h2>我是子组件的标题</h2>
+                <slot>
+                    只有在没有要分发的内容时才会显示。
+                </slot>
+            </div>
+            `,
+        });
+
+        Vue.component("app-layout", {
+            template: `
+            <div class="container">
+                <header>
+                    <slot name="header"></slot>
+                </header>
+                <main>
+                    <slot></slot>
+                </main>
+                <footer>
+                    <slot name="footer"></slot>
+                </footer>
+            </div>
+            `,
+        });
+
+        Vue.component("child", {
+            template: `
+            <div class="child">
+                <slot text="hello from child"></slot>
+            </div>
+            `,
+        });
+
+        var data = {
+
+        }
+
+        Vue.component("custom-list", {
+            template: `
+            <ul>
+                <slot name="item"
+                    v-for="item in items"
+                    :text="item.text">
+                    <!-- 这里写入备用内容 -->
+                    didn't render well
+                </slot>
+            </ul>
+            `,
+            props: ["items"],
+        });
+
+        Vue.component('async-example', function (resolve, reject) {
+            setTimeout(function () {
+                // 将组件定义传入 resolve 回调函数
+                resolve({
+                    template: '<div>I am async!</div>'
+                })
+            }, 1000)
+        })
+
+        var app = new Vue({
+            el: "#app",
+            data: {
+                items: [{
+                        id: 1,
+                        text: "test1"
+                    },
+                    {
+                        id: 2,
+                        text: "test2"
+                    },
+                    {
+                        id: 3,
+                        text: "test3"
+                    },
+                ],
+            }
+        });
+        console.log(app.$refs.comp1);
+    </script>
+</body>
+
+</html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,54 +8,134 @@
     <script src="https://unpkg.com/vue"></script>
     <title>vue103</title>
 </head>
+
 <body>
 
-    <div id="app" v-on:increase="parentHandle">
+    <div id="app" @click="doTheThing">
         <p>
             <input type="text" v-model="message.message1">
             <input type="text" v-model="message.message2">
         </p>
         <!-- <child-component :message1="message.message1" :message2="message.message2"></child-component> -->
-        <child-component v-bind="message" :init-counter="initCounter"></child-component>
+        <child-component :message1="message1" v-bind="message" :init-counter="initCounter" @increase="parentHandle" @click.native="doTheThing">
+            <p>我是插入插槽的内容！</p>
+        </child-component>
+        <select v-model="selected" multiple style="width: 50px;">
+            <option value="a">A</option>
+            <option value="b">B</option>
+            <option value="c">C</option>
+        </select>
+        <br>
+        <span>Selected: {{ selected }}</span>
+        <hr>
+        <app-layout>
+            <h1 slot="header">这里可能是一个页面标题</h1>
+
+            <p>主要内容的一个段落。</p>
+            <p>另一个主要段落。</p>
+
+            <p slot="footer">这里有一些联系信息</p>
+        </app-layout>
+        <hr>
+        <div>
+            <child>
+                <template slot-scope="props">
+                    <span>hello from parent</span>
+                    <span>{{ props.text }}</span>
+                </template>
+            </child>
+        </div>
+        <<keep-alive>
+            <component :is="currentView"></component>
+        </keep-alive>>
     </div>
 
     <!-- JS blow -->
     <script>
-        Vue.component("child-component" , {
+        Vue.component("child-component", {
             template: `<div>
                         <span> {{ message1 }} - {{ message2 }} </span>
-                        <p> {{counter}} </p>
+                        <p> {{initCounter}} </p>
                         <button @click="increaseCounter"> + </button>
+                        <div>
+                            <slot>当你没有要分发的内容时这个插槽的默认内容才会显示！</slot>
+                        </div>
                        </div>
                       `,
-            props: ['message1','message2','initCounter'],
-            data: function(){
-                return { counter: this.initCounter }
+            props: ['message1', 'message2', 'initCounter'],
+            data: function () {
+                return {
+                    counter: this.initCounter
+                }
             },
             methods: {
-                increaseCounter: function(){
-                    this.counter++;
+                increaseCounter: function () {
                     this.$emit('increase');
                 }
             }
         });
 
-        new Vue({
+        Vue.component("child", {
+            template: `<div class="child">
+                        <slot text="hello from child"></slot>
+                       </div>`,
+        });
+
+        Vue.component("app-layout", {
+            template: `
+            <div class="container">
+                <header>
+                    <slot name="header"></slot>
+                </header>
+                <main>
+                    <slot></slot>
+                </main>
+                <footer>
+                    <slot name="footer"></slot>
+                </footer>
+            </div>
+            `,
+        });
+
+        var comp1 = {
+            template: `
+                <p>This is component one</p>
+            `,
+        }
+        var comp2 = {
+            template: `
+                <p>This is component two</p>
+            `,
+        }
+        var comp3 = {
+            template: `
+                <p>This is component three</p>
+            `,
+        }
+
+        var app = new Vue({
             el: "#app",
             data: {
+                currentView: comp1,
                 initCounter: 0,
-                message : {
-                    message1 : 'Hello!',
-                    message2 : 'Jaye Chong.'
+                message: {
+                    message1: 'Hello!',
+                    message2: 'Jaye Chong.'
                 },
-                methods : {
-                    parentHandle : function(){
-                        console.log('receive increase event');
-                        this.initCounter++;
-                    }
+                message1: "test",
+                selected: [],
+            },
+            methods: {
+                parentHandle: function () {
+                    this.initCounter++;
+                    // console.log("receive increase event this.initCounter is "+this.initCounter);
+                },
+                doTheThing: function (e) {
+                    console.log("这是一个原生的点击事件 " + e);
                 }
             },
         });
     </script>
 </body>
+
 </html>
