@@ -9,28 +9,49 @@
 </head>
 <body>
 
-    <div id="app">
+    <div id="app" v-on:increase="parentHandle">
         <p>
             <input type="text" v-model="message.message1">
             <input type="text" v-model="message.message2">
         </p>
         <!-- <child-component :message1="message.message1" :message2="message.message2"></child-component> -->
-        <child-component v-bind="message"></child-component>
+        <child-component v-bind="message" :init-counter="initCounter"></child-component>
     </div>
 
     <!-- JS blow -->
     <script>
         Vue.component("child-component" , {
-            template: `<span> {{ message1 }} - {{ message2 }} </span>`,
-            props: ['message1','message2'],
+            template: `<div>
+                        <span> {{ message1 }} - {{ message2 }} </span>
+                        <p> {{counter}} </p>
+                        <button @click="increaseCounter"> + </button>
+                       </div>
+                      `,
+            props: ['message1','message2','initCounter'],
+            data: function(){
+                return { counter: this.initCounter }
+            },
+            methods: {
+                increaseCounter: function(){
+                    this.counter++;
+                    this.$emit('increase');
+                }
+            }
         });
 
         new Vue({
             el: "#app",
             data: {
+                initCounter: 0,
                 message : {
                     message1 : 'Hello!',
                     message2 : 'Jaye Chong.'
+                },
+                methods : {
+                    parentHandle : function(){
+                        console.log('receive increase event');
+                        this.initCounter++;
+                    }
                 }
             },
         });
