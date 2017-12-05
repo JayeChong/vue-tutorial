@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://unpkg.com/vue"></script>
+    <link rel="stylesheet" href="./style.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <button @click="toggleShow">toggle</button>
+        <transition name="fade" v-on:after-enter="afterEnter" v-on:after-leave="afterLeave">
+            <p v-if="show">This is a test text!</p>
+        </transition>
+        <hr>
+        
+        <div style="margin: 10px; width:400px;">
+            <button @click="show2 = !show2">toggle</button>
+            <transition name="bounce">
+
+                <p v-if="show2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris facilisis enim libero, at lacinia diam fermentum
+                    id. Pellentesque habitant morbi tristique senectus et netus.</p>
+
+            </transition>
+        </div>
+    </div>
+
+    <!-- JS blow -->
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true,
+                show2: true,
+            },
+            methods: {
+                toggleShow: function () {
+                    this.show = !this.show;
+                },
+                afterEnter: function (el) {
+                    console.log(el);
+                },
+                afterLeave: function (el) {
+                    console.log(el);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
