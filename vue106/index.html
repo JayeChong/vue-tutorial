@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://unpkg.com/vue"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <input type="text" v-focus v-bind:class="className">
+        <!-- <input type="text"> -->
+        <custom-list :items="items"></custom-list>
+    </div>
+    <a href="./test.html">go test page</a>
+    <!-- JS blow -->
+    <script>
+
+        Vue.directive("focus",{
+            bind : function(el , binding , vnode){
+                console.log("binded!");
+                var s = JSON.stringify;
+                console.log(
+                    'name: '       + s(binding.name) + '\n' +
+                    'value: '      + s(binding.value) + '\n' +
+                    'expression: ' + s(binding.expression) + '\n' +
+                    'argument: '   + s(binding.arg) + '\n' +
+                    'modifiers: '  + s(binding.modifiers) + '\n' +
+                    'vnode keys: ' + Object.keys(vnode).join(', '));
+            },
+            // 当元素被插入到 DOM 中时...
+            inserted : function (el) {
+                // 聚焦元素
+                el.focus()
+                console.log("inserted!");
+            }
+        });
+
+        Vue.component('custom-list',{
+            render: function(createElement){
+                if(this.items.length)
+                    return createElement(
+                        'ul',
+                        {
+                            attrs :{
+                                id : 'custom-list', 
+                            } 
+                        },
+                        [
+                            this.items.map((item)=>createElement(
+                                'li',
+                                // item.text 写这里会导致属性赋值失败，注意参数顺序！
+                                {
+                                    attrs: {
+                                        key: item.id,
+                                        id: item.id,
+                                    }
+                                },
+                                item.text,
+                            ))
+                        ]
+                    );
+                else
+                    return createElement(
+                        'p',
+                        "there is no more items"
+                    );
+            },
+            props: {
+                items : {
+                    type: Array,
+                    default: []
+                }
+            }
+        });
+
+        var app = new Vue({
+            el: "#app",
+            data: {
+                className: 'test',
+                items: [
+                    {id: 1, text: "test1"},
+                    {id: 2, text: "test2"},
+                    {id: 3, text: "test3"}
+                ],
+            }
+        });
+
+
+    </script>
+</body>
+</html>
