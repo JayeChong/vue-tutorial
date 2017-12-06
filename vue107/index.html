@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>vue-107</title>
+    <script src="https://unpkg.com/vue"></script>
+</head>
+
+<body>
+    <div id="app">
+        <example></example>
+    </div>
+    <!-- JS blow -->
+    <script>
+        Vue.component('example', {
+            template: `
+                <div>
+                    <span>{{ message }}</span><br>
+                    <button @click="updateMessage">update</button>
+                </div>
+            `,
+            data: function () {
+                return {
+                    message: '没有更新'
+                }
+            },
+            methods: {
+                updateMessage: function () {
+                    this.message = '更新完成'
+                    console.log(this.$el.innerHTML);
+                    console.log(this.$el.textContent) // => '没有更新'
+                    /*************************************************/
+                    let self = this;
+                    setTimeout(function(){console.log(self.$el.textContent);},0);
+                    this.$nextTick(function () {
+                        console.log(this.$el.textContent) // => '更新完成'
+                    })
+                }
+            }
+        })
+
+        var vm = new Vue({
+            el: "#app",
+            data: {
+                message: "this is a message",
+            }
+        });
+    </script>
+</body>
+
+</html>
